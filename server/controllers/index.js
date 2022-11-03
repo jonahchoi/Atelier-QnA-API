@@ -48,6 +48,30 @@ let controllers = {
     }
   },
 
+  helpQuestion: async (req, res) => {
+    let {question_id} = req.params;
+
+    try{
+      await model.helpQuestion(question_id);
+
+      res.sendStatus(204);
+    } catch(err) {
+      res.sendStatus(404);
+    }
+  },
+
+  reportQuestion: async (req, res) => {
+    let {question_id} = req.params;
+
+    try{
+      await model.reportQuestion(question_id);
+
+      res.sendStatus(204);
+    } catch(err) {
+      res.sendStatus(404);
+    }
+  }
+
 }
 
 module.exports = controllers;

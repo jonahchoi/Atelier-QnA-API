@@ -138,6 +138,32 @@ let model = {
       return err;
     }
   },
+
+  helpQuestion: async (question_id) => {
+    try{
+      await pool.query(`
+        UPDATE questions
+        SET question_helpfulness=question_helpfulness+1
+        WHERE id=$1
+      `, [question_id]);
+    } catch(err) {
+      console.error(err);
+      return err;
+    }
+  },
+
+  reportQuestion: async (question_id) => {
+    try{
+      await pool.query(`
+        UPDATE questions
+        SET reported=true
+        WHERE id=$1
+      `, [question_id]);
+    } catch(err) {
+      console.error(err);
+      return err;
+    }
+  }
 }
 
 /* var s = new Date( 1667512487794).toISOString();
