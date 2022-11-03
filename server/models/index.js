@@ -47,6 +47,7 @@ let model = {
       return questionResults;
     } catch(err) {
       console.error(err);
+      return err;
     }
   },
 
@@ -81,6 +82,7 @@ let model = {
       return results;
     } catch(err) {
       console.error(err);
+      return err;
     }
   },
 
@@ -94,17 +96,48 @@ let model = {
       return answerList.rows;
     } catch(err) {
       console.error(err);
+      return err;
     }
   },
 
-  addQuestion: async (question) => {
+  addQuestion: async (body, name, email, product_id) => {
     try{
-      const result = await pool.query('INSERT INTO questions (product_id, question_body, asker_name, asker_email) VALUES ($1, $2, $3, $4)', [1, 'Test Question body', 'TestName', 'email@email.com']);
-      console.log('done');
+      const result = await pool.query(`
+        INSERT INTO questions
+        (product_id, question_body, asker_name, asker_email)
+        VALUES ($1, $2, $3, $4)
+      `, [product_id, body, name, email]);
+
     } catch(err) {
       console.error(err);
+      return err;
     }
-  }
+  },
+
+  addAnswer: async (body, name, email, question_id, photos) => {
+    try{
+      const result = await pool.query(`
+        INSERT INTO answers
+        (question_id, body, answerer_name, answerer_email)
+        VALUES ($1, $2, $3, $4)
+        RETURNING id
+      `, [question_id, body, name, email]);
+
+      let insertedId = result.rows[0].id;
+
+      await Promise.all(photos.map( async (url) => {
+        await pool.query(`
+          INSERT INTO photos
+          (answer_id, url)
+          VALUES ($1, $2)
+        `, [insertedId, url]);
+      }));
+
+    } catch(err) {
+      console.error(err);
+      return err;
+    }
+  },
 }
 
 /* var s = new Date( 1667512487794).toISOString();

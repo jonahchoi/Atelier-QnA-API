@@ -8,7 +8,6 @@ let controllers = {
       let data = await model.getQuestions(product_id, page, count);
 
       res.status(200).send(data);
-
     } catch(err) {
       res.sendStatus(404);
     }
@@ -17,12 +16,36 @@ let controllers = {
     let {question_id} = req.params;
     let {page, count} = req.query;
 
-    let data = await model.getAnswers(question_id, page, count);
+    try{
+      let data = await model.getAnswers(question_id, page, count);
 
-    res.status(200).send(data);
+      res.status(200).send(data);
+    } catch(err) {
+      res.sendStatus(404);
+    }
   },
-  addQuestion: (req, res) => {
+  postQuestion: async (req, res) => {
+    let {body, name, email, product_id} = req.body;
 
+    try{
+      await model.addQuestion(body, name, email, product_id);
+
+      res.sendStatus(201);
+    } catch(err) {
+      res.sendStatus(404);
+    }
+  },
+  postAnswer: async (req, res) => {
+    let {question_id} = req.params;
+    let {body, name, email, photos} = req.body;
+
+    try{
+      await model.addAnswer(body, name, email, question_id, photos);
+
+      res.sendStatus(201);
+    } catch(err) {
+      res.sendStatus(404);
+    }
   },
 
 }
