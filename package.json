@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "server-dev": "nodemon ./server/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "psql -h localhost -U jonahchoi -d testdb -f schema.sql"
   },
   "repository": {
     "type": "git",
