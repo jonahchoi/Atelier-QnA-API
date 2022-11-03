@@ -163,7 +163,33 @@ let model = {
       console.error(err);
       return err;
     }
-  }
+  },
+
+  helpAnswer: async (answer_id) => {
+    try{
+      await pool.query(`
+        UPDATE answers
+        SET helpfulness=helpfulness+1
+        WHERE id=$1
+      `, [answer_id]);
+    } catch(err) {
+      console.error(err);
+      return err;
+    }
+  },
+
+  reportAnswer: async (answer_id) => {
+    try{
+      await pool.query(`
+        UPDATE answers
+        SET reported=true
+        WHERE id=$1
+      `, [answer_id]);
+    } catch(err) {
+      console.error(err);
+      return err;
+    }
+  },
 }
 
 /* var s = new Date( 1667512487794).toISOString();

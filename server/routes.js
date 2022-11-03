@@ -9,7 +9,7 @@ router.post('/qa/questions', controllers.postQuestion);
 router.post('/qa/questions/:question_id/answers', controllers.postAnswer);
 router.put('/qa/questions/:question_id/helpful', controllers.helpQuestion);
 router.put('/qa/questions/:question_id/report', controllers.reportQuestion);
-// router.put('/qa/answers/:answer_id/helpful', controllers.helpAnswer);
-// router.put('/qa/answers/:answer_id/report', controllers.reportAnswer);
+router.put('/qa/answers/:answer_id/helpful', controllers.helpAnswer);
+router.put('/qa/answers/:answer_id/report', controllers.reportAnswer);
 
 module.exports = router;

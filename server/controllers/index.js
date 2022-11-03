@@ -70,6 +70,30 @@ let controllers = {
     } catch(err) {
       res.sendStatus(404);
     }
+  },
+
+  helpAnswer: async (req, res) => {
+    let {answer_id} = req.params;
+
+    try{
+      await model.helpAnswer(answer_id);
+
+      res.sendStatus(204);
+    } catch(err) {
+      res.sendStatus(404);
+    }
+  },
+
+  reportAnswer: async (req, res) => {
+    let {answer_id} = req.params;
+
+    try{
+      await model.reportAnswer(answer_id);
+
+      res.sendStatus(204);
+    } catch(err) {
+      res.sendStatus(404);
+    }
   }
 
 }
