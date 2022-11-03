@@ -1,11 +1,19 @@
 const { pool } = require('../db');
 
 let model = {
-  getQuestions: async (qId) => {
-    try{
-      const result = await pool.query('SELECT * FROM questions WHERE id=$1', [qId]);
+  getQuestions: async (product_id, page=1, count=5) => {
+    let pageRows = (page - 1) * count;
 
-      console.log(result);
+    try{
+      const result = await pool.query(`
+        SELECT * FROM questions
+        WHERE product_id=$1
+        ORDER BY question_helpfulness DESC
+        OFFSET $2 ROWS
+        FETCH NEXT $3 ROWS ONLY
+      `, [product_id, pageRows, count]);
+
+      return result.rows;
     } catch(err) {
       console.error(err);
     }
@@ -21,8 +29,8 @@ let model = {
   }
 }
 
-var s = new Date(1616168857762).toISOString();
-console.log(s);
+/* var s = new Date(1616168857762).toISOString();
+console.log(s); */
 
 // model.getQuestions();
 

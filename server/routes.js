@@ -3,6 +3,6 @@ const router = express.Router();
 const controllers = require('./controllers');
 
 // own routes to controller here
-router.get('');
+router.get('/qa/questions', controllers.getQuestions);
 
 module.exports = router;
