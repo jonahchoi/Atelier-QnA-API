@@ -1,9 +1,9 @@
 const { pool } = require('../db');
 
 let model = {
-  getQuestions: async () => {
+  getQuestions: async (qId) => {
     try{
-      const result = await pool.query('SELECT * FROM test');
+      const result = await pool.query('SELECT * FROM questions WHERE id=$1', [qId]);
 
       console.log(result);
     } catch(err) {
@@ -11,7 +11,7 @@ let model = {
     }
   },
 
-  addQuestion: async () => {
+  addQuestion: async (question) => {
     try{
       const result = await pool.query('INSERT INTO questions (product_id, question_body, asker_name, asker_email) VALUES ($1, $2, $3, $4)', [1, 'Test Question body', 'TestName', 'email@email.com']);
       console.log('done');

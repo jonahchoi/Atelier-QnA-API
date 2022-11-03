@@ -6,7 +6,7 @@ const pool = new pg.Pool({
   database: process.env.DATABASE_NAME,
   password: process.env.PASSWORD,
   port: process.env.PGPORT,
-  host: 'localhost', //Insert Server ip address after deployment
+  host: process.env.PGHOST, //Insert Server ip address after deployment
 });
 
 module.exports = { pool };

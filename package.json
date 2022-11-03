@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "server-dev": "nodemon ./server/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "seed": "psql -h localhost -U jonahchoi -d testdb -f schema.sql"
+    "test": "npm jest",
+    "seed": "dotenv -- cross-var psql -h %PGHOST% -U %USERNAME% -d %DATABASE_NAME% -f schema.sql"
   },
   "repository": {
     "type": "git",
@@ -21,7 +21,9 @@
   "homepage": "https://github.com/System-Design-Casper-Reactor/SDC-Starter-template#readme",
   "dependencies": {
     "axios": "^1.1.3",
+    "cross-var": "^1.1.0",
     "dotenv": "^16.0.3",
+    "dotenv-cli": "^6.0.0",
     "express": "^4.18.2",
     "morgan": "^1.10.0",
     "pg": "^8.8.0"
