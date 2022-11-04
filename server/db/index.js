@@ -9,7 +9,7 @@ const pool = new pg.Pool({
   host: process.env.PGHOST, //Insert Server ip address after deployment
 });
 
-module.exports = { pool };
+module.exports = pool;
 
 /* const client = new pg.Client({
   user: process.env.USERNAME,

@@ -1,4 +1,4 @@
-const { pool } = require('../db');
+const pool = require('../db');
 
 const answersArrayToObject = (answers) => {
   let result = {};
@@ -27,6 +27,7 @@ let model = {
         OFFSET $2 ROWS
         FETCH NEXT $3 ROWS ONLY
       `, [product_id, pageRows, count]);
+
       //Probably modify later to use join table
       let modifiedQs = await Promise.all(result.rows.map(async (row) => {
         let answers = await model.getAnswers(row.question_id);

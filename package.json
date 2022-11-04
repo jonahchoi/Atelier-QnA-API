@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "server-dev": "nodemon ./server/index.js",
-    "test": "npm jest",
+    "test": "jest",
     "seed": "dotenv -- cross-var psql -h %PGHOST% -U %USERNAME% -d %DATABASE_NAME% -f schema.sql"
   },
   "repository": {
