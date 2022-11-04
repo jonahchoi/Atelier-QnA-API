@@ -27,7 +27,6 @@ let model = {
         OFFSET $2 ROWS
         FETCH NEXT $3 ROWS ONLY
       `, [product_id, pageRows, count]);
-
       //Probably modify later to use join table
       let modifiedQs = await Promise.all(result.rows.map(async (row) => {
         let answers = await model.getAnswers(row.question_id);
@@ -88,12 +87,12 @@ let model = {
 
   getPhotos: async (answer_id) => {
     try{
-      const answerList = await pool.query(`
+      const photoList = await pool.query(`
         SELECT id, url FROM photos
         WHERE answer_id=$1
       `, [answer_id]);
 
-      return answerList.rows;
+      return photoList.rows;
     } catch(err) {
       console.error(err);
       return err;
@@ -146,6 +145,7 @@ let model = {
         SET question_helpfulness=question_helpfulness+1
         WHERE id=$1
       `, [question_id]);
+
     } catch(err) {
       console.error(err);
       return err;
