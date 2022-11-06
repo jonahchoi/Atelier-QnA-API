@@ -11,9 +11,14 @@ config:
     # - duration: 600
     #   arrivalRate: 50
     #   name: Sustained load
+  payload:
+    path: "../data/answers_spec.csv"
+    fields:
+      - "id"
+      - "question_id"
 
 scenarios:
-  - name: "GET Questions"
+  - name: "Answers flow"
     flow:
       - get:
-          url: "/qa/questions?product_id=1"
+          url: "/qa/questions/{{ question_id }}/answers"

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS questions(
   question_body VARCHAR(1000) NOT NULL,
   asker_name VARCHAR(60) NOT NULL,
   asker_email VARCHAR(60) NOT NULL,
-  question_date bigint DEFAULT extract(epoch from now()) * 1000,
+  unix_date bigint,
   question_helpfulness int DEFAULT 0,
   reported boolean DEFAULT false
 );
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS answers(
   body VARCHAR(1000) NOT NULL,
   answerer_name VARCHAR(60) NOT NULL,
   answerer_email VARCHAR(60) NOT NULL,
-  date bigint DEFAULT extract(epoch from now()) * 1000,
+  unix_date bigint,
   helpfulness int DEFAULT 0,
   reported boolean DEFAULT false,
   CONSTRAINT fk_question
@@ -34,10 +34,17 @@ CREATE TABLE IF NOT EXISTS photos(
       REFERENCES answers(id)
 );
 
-\COPY questions(id, product_id, question_body, question_date, asker_name, asker_email, reported, question_helpfulness) FROM './data/questions.csv' DELIMITER ',' csv header;
-\COPY answers(id, question_id, body, date, answerer_name, answerer_email, reported, helpfulness) FROM './data/answers.csv' DELIMITER ',' csv header;
+\COPY questions(id, product_id, question_body, unix_date, asker_name, asker_email, reported, question_helpfulness) FROM './data/questions.csv' DELIMITER ',' csv header;
+\COPY answers(id, question_id, body, unix_date, answerer_name, answerer_email, reported, helpfulness) FROM './data/answers.csv' DELIMITER ',' csv header;
 \COPY photos(id, answer_id, url) FROM './data/answers_photos.csv' DELIMITER ',' csv header;
 
+ALTER TABLE questions ADD question_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+UPDATE questions SET question_date = to_timestamp(unix_date/1000);
+ALTER TABLE questions DROP COLUMN unix_date;
+
+ALTER TABLE answers ADD date TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+UPDATE answers SET date = to_timestamp(unix_date/1000);
+ALTER TABLE answers DROP COLUMN unix_date;
 
 SELECT setval(pg_get_serial_sequence('questions', 'id'), (select max(id) from questions));
 SELECT setval(pg_get_serial_sequence('answers', 'id'), (select max(id) from answers));
