@@ -1,50 +1,42 @@
 const pool = require('../db');
-
-const answersArrayToObject = (answers) => {
-  let result = {};
-
-  answers.forEach(row => {
-    //Rename answer_id to id to follow format of old API
-    row.id = row.answer_id;
-    row.answer_id = undefined;
-    result[row.id] = row;
-  });
-
-  return result;
-};
+const coalesce = require('pg-coalesce');
 
 let model = {
   getQuestions: async (product_id, page=1, count=5) => {
     let pageRows = (page - 1) * count;
 
     try{
-      const result = await pool.query(`
-        SELECT id AS question_id, question_body, question_date, asker_name, question_helpfulness, reported
-        FROM questions
-        WHERE product_id=$1
-        AND reported=false
-        ORDER BY question_helpfulness DESC
-        OFFSET $2 ROWS
-        FETCH NEXT $3 ROWS ONLY
+      const questionList = await pool.query(`
+        SELECT json_build_object(
+          'product_id', $1::int,
+          'results', (SELECT COALESCE(json_agg(row_to_json(results)), '[]'::json) FROM (
+            SELECT id AS question_id, question_body, question_date, asker_name, question_helpfulness, reported, (
+              SELECT COALESCE(json_object_agg(results.id, row_to_json(results)), '{}'::json) FROM (
+                SELECT id, body, date, answerer_name, helpfulness, (
+                  SELECT COALESCE(json_agg(row_to_json(photo_res)), '[]'::json) FROM (
+                    SELECT id, url
+                    FROM photos
+                    WHERE photos.answer_id=answers.id
+                  )photo_res
+                ) photos
+                FROM answers
+                WHERE answers.question_id=questions.id
+                AND reported=false
+                ORDER BY helpfulness DESC
+                LIMIT 2
+              ) results
+            ) answers
+            FROM questions
+            WHERE product_id=$1
+            AND reported=false
+            ORDER BY question_helpfulness DESC
+            OFFSET $2 ROWS
+            FETCH NEXT $3 ROWS ONLY
+          ) results)
+        )
       `, [product_id, pageRows, count]);
+      return questionList.rows[0].json_build_object;
 
-      //Probably modify later to use join table
-      let modifiedQs = await Promise.all(result.rows.map(async (row) => {
-        let answers = await model.getAnswers(row.question_id);
-        answers = answersArrayToObject(answers.results);
-
-        row.question_date = new Date(+row.question_date).toISOString();
-        row.answers = answers;
-
-        return row;
-      }));
-
-      let questionResults = {
-        product_id: product_id,
-        results: modifiedQs
-      };
-
-      return questionResults;
     } catch(err) {
       console.error(err);
       return err;
@@ -56,44 +48,29 @@ let model = {
 
     try{
       const answerList = await pool.query(`
-        SELECT id AS answer_id, body, date, answerer_name, helpfulness
-        FROM answers
-        WHERE question_id=$1
-        AND reported=false
-        ORDER BY helpfulness DESC
-        OFFSET $2 ROWS
-        FETCH NEXT $3 ROWS ONLY
-      `, [question_id, pageRows, count]);
+        SELECT json_build_object(
+          'question', $1::int,
+          'page', $2::int,
+          'count', $3::int,
+          'results', (SELECT COALESCE(json_agg(row_to_json(results)), '[]'::json) FROM (
+            SELECT id as answer_id, body, date, answerer_name, helpfulness, (
+              SELECT COALESCE(json_agg(row_to_json(photo_res)), '[]'::json) FROM (
+                SELECT id, url
+                FROM photos
+                WHERE photos.answer_id=answers.id
+              )photo_res
+            ) photos
+            FROM answers
+            WHERE question_id=$1
+            AND reported=false
+            ORDER BY helpfulness DESC
+            OFFSET $3 ROWS
+            FETCH NEXT $4 ROWS ONLY
+          ) results)
+        )
+      `, [question_id, page, pageRows, count]);
+      return answerList.rows[0].json_build_object;
 
-      let finalList = await Promise.all(answerList.rows.map(async (row) => {
-        const photos = await model.getPhotos(row.answer_id);
-        row.photos = photos;
-        row.date = new Date(+row.date).toISOString();
-        return row;
-      }));
-
-      let results = {
-        question: question_id,
-        page: +page,
-        count: +count,
-        results: finalList
-      }
-
-      return results;
-    } catch(err) {
-      console.error(err);
-      return err;
-    }
-  },
-
-  getPhotos: async (answer_id) => {
-    try{
-      const photoList = await pool.query(`
-        SELECT id, url FROM photos
-        WHERE answer_id=$1
-      `, [answer_id]);
-
-      return photoList.rows;
     } catch(err) {
       console.error(err);
       return err;
