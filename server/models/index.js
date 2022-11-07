@@ -1,5 +1,4 @@
 const pool = require('../db');
-const coalesce = require('pg-coalesce');
 
 let model = {
   getQuestions: async (product_id, page=1, count=5) => {
@@ -102,13 +101,17 @@ let model = {
 
       let insertedId = result.rows[0].id;
 
-      await Promise.all(photos.map( async (url) => {
+      /* await Promise.all(photos.map( async (url) => {
         await pool.query(`
           INSERT INTO photos
           (answer_id, url)
           VALUES ($1, $2)
         `, [insertedId, url]);
-      }));
+      })); */
+      await pool.query(`
+        INSERT INTO photos (answer_id, url)
+        VALUES ($1, unnest($2::text[]));
+      `, [insertedId, photos])
 
     } catch(err) {
       console.error(err);
