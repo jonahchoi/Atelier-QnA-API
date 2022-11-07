@@ -46,6 +46,10 @@ ALTER TABLE answers ADD date TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 UPDATE answers SET date = to_timestamp(unix_date/1000);
 ALTER TABLE answers DROP COLUMN unix_date;
 
+CREATE INDEX product_index ON questions (product_id);
+CREATE INDEX question_index ON answers (question_id);
+CREATE INDEX answer_index ON photos (answer_id);
+
 SELECT setval(pg_get_serial_sequence('questions', 'id'), (select max(id) from questions));
 SELECT setval(pg_get_serial_sequence('answers', 'id'), (select max(id) from answers));
 SELECT setval(pg_get_serial_sequence('photos', 'id'), (select max(id) from photos));

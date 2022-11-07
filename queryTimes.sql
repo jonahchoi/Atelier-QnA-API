@@ -47,6 +47,12 @@ SELECT json_build_object(
     FETCH NEXT 5 ROWS ONLY
   ) results)
 );
+
+INSERT INTO questions (product_id, asker_name, asker_email, question_body)
+VALUES (1, 'Test', 'test@email.com', 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum');
+
+INSERT INTO answers (question_id, answerer_name, answerer_email, body)
+VALUES (1, 'Test',  'test@email.com', 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum');
 \timing
 
 
