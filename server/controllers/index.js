@@ -3,7 +3,10 @@ const model = require('../models');
 let controllers = {
   getQuestions: async (req, res) => {
     let {product_id, page, count} = req.query;
-
+    if(product_id === undefined || isNaN(+product_id)) {
+      res.status(422).send('Error: invalid product_id provided');
+      return;
+    }
     try{
       let data = await model.getQuestions(product_id, page, count);
 
@@ -15,7 +18,10 @@ let controllers = {
   getAnswers: async (req, res) => {
     let {question_id} = req.params;
     let {page, count} = req.query;
-
+    if(question_id === undefined || isNaN(+question_id)) {
+      res.status(422).send('Error: invalid question_id provided');
+      return;
+    }
     try{
       let data = await model.getAnswers(question_id, page, count);
 

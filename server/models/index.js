@@ -34,11 +34,12 @@ let model = {
           ) results)
         )
       `, [product_id, pageRows, count]);
+
       return questionList.rows[0].json_build_object;
 
     } catch(err) {
-      console.error(err);
-      return err;
+      throw new Error(err);
+      // return err;
     }
   },
 
@@ -71,8 +72,7 @@ let model = {
       return answerList.rows[0].json_build_object;
 
     } catch(err) {
-      console.error(err);
-      return err;
+      throw new Error(err);
     }
   },
 
@@ -85,8 +85,7 @@ let model = {
       `, [product_id, body, name, email]);
 
     } catch(err) {
-      console.error(err);
-      return err;
+      throw new Error(err);
     }
   },
 
@@ -111,11 +110,10 @@ let model = {
       await pool.query(`
         INSERT INTO photos (answer_id, url)
         VALUES ($1, unnest($2::text[]));
-      `, [insertedId, photos])
+      `, [insertedId, photos]);
 
     } catch(err) {
-      console.error(err);
-      return err;
+      throw new Error(err);
     }
   },
 
@@ -128,8 +126,7 @@ let model = {
       `, [question_id]);
 
     } catch(err) {
-      console.error(err);
-      return err;
+      throw new Error(err);
     }
   },
 
@@ -141,8 +138,7 @@ let model = {
         WHERE id=$1
       `, [question_id]);
     } catch(err) {
-      console.error(err);
-      return err;
+      throw new Error(err);
     }
   },
 
@@ -154,8 +150,7 @@ let model = {
         WHERE id=$1
       `, [answer_id]);
     } catch(err) {
-      console.error(err);
-      return err;
+      throw new Error(err);
     }
   },
 
@@ -167,8 +162,7 @@ let model = {
         WHERE id=$1
       `, [answer_id]);
     } catch(err) {
-      console.error(err);
-      return err;
+      throw new Error(err);
     }
   },
 }
