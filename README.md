@@ -1,3 +1,2 @@
-# SDC-Starter-template
+# Atelier Questions and Answers API
 
-Fork and clone this repo to start working on your widget!
